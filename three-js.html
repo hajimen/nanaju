@@ -22,6 +22,7 @@
         }
 
         .item {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
             font-size: x-large;
             width: 10em;
         }
@@ -59,18 +60,16 @@
 
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(width, height);
-            renderer.shadowMap.enabled = true;
-            renderer.physicallyCorrectLights = true;
             renderer.outputEncoding = THREE.sRGBEncoding;
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMapping = THREE.CineonToneMapping;
 
             // シーンの作成
             const scene = new THREE.Scene();
             scene.background = new THREE.Color(0x808080);
 
             // カメラの作成
-            const camera = new THREE.PerspectiveCamera(10, width / height, 1, 500);
-            camera.position.set(0, 2, 0);
+            const camera = new THREE.PerspectiveCamera(10, width / height, 0.2, 10);
+            camera.position.set(0, 1.5, 0);
             camera.lookAt(new THREE.Vector3(0, 0, 0));
 
             // カメラコントローラーの作成
@@ -78,12 +77,7 @@
             controls.enableDamping = true;
             controls.dampingFactor = 0.2;
 
-            // 環境光源の作成
-            // const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-            // scene.add(ambientLight);
-            
             let model; // モデルを格納する変数
-            const lights = []; // ライトを格納する配列
 
             // ウィンドウサイズ変更時の対応
             window.addEventListener('resize', () => {
@@ -100,30 +94,6 @@
             gltfLoader.load('Nanaju.glb', (gltf) => {
                 model = gltf.scene;
 
-                // モデル内のライトをリストに収集
-                model.traverse((obj) => {
-                    if (obj.isMesh) {
-                        // obj.castShadow = true;
-                        // obj.receiveShadow = true;
-                    // } else if (obj.isLight) {
-                    //     lights.push(obj);
-                    }
-                });
-
-                // GLBファイル内のライトのプロパティをもとに新しいライトを作成してシーンに追加
-                lights.forEach((light) => {
-                    let newLight = new THREE.PointLight(light.color, light.intensity, light.distance, light.decay);
-                    newLight.position.copy(light.position);
-                    newLight.castShadow = true;
-                    newLight.shadow.mapSize.width = 1024;
-                    newLight.shadow.mapSize.height = 1024;
-                    newLight.shadow.radius = 30;
-
-                    // 明るさ（intensity）の調整
-                    newLight.intensity = light.intensity = 0.7;
-                    scene.add(newLight);
-                });
-
                 // モデルをシーンに追加
                 scene.add(model);
                 model.scale.set(1, 1, 1);
@@ -134,7 +104,6 @@
 
             }, (xhr) => {
                 const progress = Math.round((xhr.loaded / 40191332) * 100);
-                console.log(progress);
                 loadingElement.textContent = "Loading: " + progress + "%";
             }, (error) => {
                 console.error('GLBモデルの読み込み中にエラーが発生しました', error);
