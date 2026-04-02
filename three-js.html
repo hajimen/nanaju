@@ -14,11 +14,26 @@
         #myCanvas {
             display: block;
         }
-    </style>
+        .container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item {
+            font-size: x-large;
+            width: 10em;
+        }
+
+</style>
 </head>
 
 <body>
     <canvas id="myCanvas"></canvas>
+    <div class="container">
+        <div class="item" id="loading">Loading: 0%</div>
+    </div>
 
     <!-- Three.jsと必要なライブラリをCDNから読み込みます -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -36,6 +51,7 @@
 
             // レンダラーの設定
             const canvasElement = document.querySelector('#myCanvas');
+            canvasElement.style.display ="none";
             const renderer = new THREE.WebGLRenderer({
                 antialias: true,
                 canvas: canvasElement,
@@ -80,6 +96,7 @@
 
             // 3Dモデルの読み込み
             const gltfLoader = new THREE.GLTFLoader();
+            const loadingElement = document.querySelector('#loading');
             gltfLoader.load('Nanaju.glb', (gltf) => {
                 model = gltf.scene;
 
@@ -112,8 +129,14 @@
                 model.scale.set(1, 1, 1);
                 model.position.set(0, 0, 0);
 
+                loadingElement.style.display ="none";
+                canvasElement.style.display ="block";
 
-            }, undefined, (error) => {
+            }, (xhr) => {
+                const progress = Math.round((xhr.loaded / xhr.total) * 100);
+                console.log(progress);
+                loadingElement.textContent = "Loading: " + progress + "%";
+            }, (error) => {
                 console.error('GLBモデルの読み込み中にエラーが発生しました', error);
             });
 
