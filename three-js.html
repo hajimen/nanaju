@@ -133,7 +133,7 @@
                 canvasElement.style.display ="block";
 
             }, (xhr) => {
-                const progress = Math.round((xhr.loaded / xhr.total) * 100);
+                const progress = Math.round((xhr.loaded / 40191332) * 100);
                 console.log(progress);
                 loadingElement.textContent = "Loading: " + progress + "%";
             }, (error) => {
